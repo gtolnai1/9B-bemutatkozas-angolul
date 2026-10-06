@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Angol Tanulókártyák (A1) - Zsigmondy Gimnázium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 3D Kártya forgatás effektusok */
+        .flip-card {
+            background-color: transparent;
+            perspective: 1000px; /* 3D hatás */
+        }
+        
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        
+        /* A kártya megfordítása */
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        /* Előlap és hátlap pozicionálása */
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari támogatás */
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+        }
+        
+        .flip-card-front {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #1e3a8a;
+            border: 2px solid #bfdbfe;
+        }
+        
+        .flip-card-back {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce3 100%);
+            color: #14532d;
+            border: 2px solid #bbf7d0;
+            transform: rotateY(180deg);
+        }
+
+        /* Letiltott gombok stílusa */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col font-sans text-gray-800">
+
+    <!-- Fejléc -->
+    <header class="bg-blue-600 text-white p-4 shadow-md text-center">
+        <h1 class="text-xl font-bold"><i class="fa-solid fa-graduation-cap mr-2"></i>Bemutatkozás Angolul (A1)</h1>
+        <p class="text-sm text-blue-100 mt-1">Angolgyorsan.hu</p>
+    </header>
+
+    <!-- Fő tartalom -->
+    <main class="flex-grow flex flex-col items-center justify-center p-4 max-w-lg mx-auto w-full">
+        
+        <!-- Haladás jelző -->
+        <div class="w-full mb-6 text-center">
+            <span id="progress-text" class="text-gray-500 font-medium bg-gray-200 px-4 py-1 rounded-full">Kártya: 1 / 20</span>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
+                <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 5%"></div>
+            </div>
+        </div>
+
+        <!-- Tanulókártya Konténer -->
+        <div id="card-container" class="flip-card w-full h-64 sm:h-72 cursor-pointer mb-8" onclick="toggleCard()">
+            <div class="flip-card-inner" id="card-inner">
+                <!-- Előlap (Angol) -->
+                <div class="flip-card-front">
+                    <span class="text-xs font-bold uppercase tracking-wider text-blue-400 mb-2">Angol</span>
+                    <p id="english-text" class="text-2xl sm:text-3xl font-semibold text-center mb-6 leading-tight">Hello. My name is...</p>
+                    
+                    <!-- Hang gomb (Megakadályozzuk, hogy a kártya is megforduljon kattintáskor) -->
+                    <button onclick="playAudio(event)" class="absolute bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg transition-transform active:scale-95" aria-label="Kiejtés meghallgatása">
+                        <i class="fa-solid fa-volume-high text-lg"></i>
+                    </button>
+                    
+                    <p class="absolute bottom-4 text-xs text-blue-400"><i class="fa-solid fa-rotate mr-1"></i>Kattints a fordításhoz</p>
+                </div>
+                
+                <!-- Hátlap (Magyar) -->
+                <div class="flip-card-back">
+                    <span class="text-xs font-bold uppercase tracking-wider text-green-500 mb-2">Magyar</span>
+                    <p id="hungarian-text" class="text-xl sm:text-2xl font-medium text-center leading-tight">Szia. A nevem...</p>
+                    <p class="absolute bottom-4 text-xs text-green-500"><i class="fa-solid fa-rotate mr-1"></i>Kattints a visszafordításhoz</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vezérlő gombok -->
+        <div class="flex justify-between w-full gap-4">
+            <button id="btn-prev" onclick="prevCard()" class="flex-1 bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-xl shadow-sm hover:bg-gray-50 flex items-center justify-center gap-2 font-medium transition-colors">
+                <i class="fa-solid fa-chevron-left"></i> Előző
+            </button>
+            <button id="btn-next" onclick="nextCard()" class="flex-1 bg-blue-600 text-white py-3 px-4 rounded-xl shadow-sm hover:bg-blue-700 flex items-center justify-center gap-2 font-medium transition-colors">
+                Következő <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Lábléc -->
+    <footer class="text-center p-4 text-gray-400 text-sm">
+        <p>Készült a diákok számára &hearts;</p>
+    </footer>
+
+    <script>
+        // A 20 mondatot tartalmazó adatbázis
+        const flashcards = [
+            { en: "Hello. My name is...", hu: "Szia. A nevem... (helyettesítsd be a neved)" },
+            { en: "I am fifteen years old.", hu: "15 éves vagyok." },
+            { en: "I live in Dorog.", hu: "Dorogon élek." },
+            { en: "I am from Hungary.", hu: "Magyarországról származom." },
+            { en: "I am a student.", hu: "Diák vagyok." },
+            { en: "I study at Zsigmondy Vilmos Gimnázium in Dorog.", hu: "Dorogon a Zsigmondy Vilmos Gimnáziumban tanulok." },
+            { en: "I am in the ninth grade.", hu: "Kilencedikes vagyok. (9. évfolyamba járok.)" },
+            { en: "I have a pet dog.", hu: "Van egy kutyám." },
+            { en: "I don't have a cat.", hu: "Nincs macskám." },
+            { en: "My favorite subject is English.", hu: "A kedvenc tantárgyam az angol." },
+            { en: "I like listening to music.", hu: "Szeretek zenét hallgatni." },
+            { en: "I play sports after school.", hu: "Suli után sportolok." },
+            { en: "I have a brother.", hu: "Van egy fiútestvérem." },
+            { en: "I don't have a sister.", hu: "Nincs lánytestvérem." },
+            { en: "My favorite color is blue.", hu: "A kedvenc színem a kék." },
+            { en: "I like eating pizza.", hu: "Szeretek pizzát enni." },
+            { en: "I usually wake up at six o'clock.", hu: "Általában 6 órakor ébredek." },
+            { en: "I go to school by bus.", hu: "Busszal járok iskolába." },
+            { en: "I meet my friends at the weekend.", hu: "Hétvégén találkozom a barátaimmal." },
+            { en: "Nice to meet you.", hu: "Örülök, hogy megismertem / megismertelek." }
+        ];
+
+        let currentIndex = 0;
+        const cardContainer = document.getElementById('card-container');
+        const englishText = document.getElementById('english-text');
+        const hungarianText = document.getElementById('hungarian-text');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+
+        // Kártya adatainak betöltése a DOM-ba
+        function loadCard() {
+            // Ha a kártya meg van fordulva (magyar látszik), fordítsuk vissza angolra
+            if (cardContainer.classList.contains('flipped')) {
+                cardContainer.classList.remove('flipped');
+                // Várjuk meg a fordítási animációt, mielőtt szöveget cserélünk (opcionális, de szebb)
+                setTimeout(updateContent, 300);
+            } else {
+                updateContent();
+            }
+        }
+
+        function updateContent() {
+            const currentCard = flashcards[currentIndex];
+            englishText.textContent = currentCard.en;
+            hungarianText.textContent = currentCard.hu;
+            
+            // UI frissítése
+            progressText.textContent = `Kártya: ${currentIndex + 1} / ${flashcards.length}`;
+            const percent = ((currentIndex + 1) / flashcards.length) * 100;
+            progressBar.style.width = `${percent}%`;
+
+            // Gombok állapotának kezelése
+            btnPrev.disabled = currentIndex === 0;
+            btnNext.disabled = currentIndex === flashcards.length - 1;
+        }
+
+        // Kártya megfordítása (kattintásra)
+        function toggleCard() {
+            cardContainer.classList.toggle('flipped');
+        }
+
+        // Következő kártya
+        function nextCard() {
+            if (currentIndex < flashcards.length - 1) {
+                currentIndex++;
+                loadCard();
+            }
+        }
+
+        // Előző kártya
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                loadCard();
+            }
+        }
+
+        // Szövegfelolvasás (Text-to-Speech)
+        function playAudio(event) {
+            // Megakadályozzuk, hogy a kártya megforduljon, amikor a hangszóróra kattintunk
+            event.stopPropagation();
+            
+            const textToSpeak = flashcards[currentIndex].en;
+            
+            if ('speechSynthesis' in window) {
+                // Állítsuk le az előző beszédet, ha még tart
+                window.speechSynthesis.cancel();
+
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.lang = 'en-US'; // Amerikai angol
+                utterance.rate = 0.85; // Kicsit lassabb tempó a kezdők kedvéért
+                utterance.pitch = 1.0;
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Sajnos a böngésződ nem támogatja a szövegfelolvasó funkciót.");
+            }
+        }
+
+        // Billentyűzet támogatás (nyilak és szóköz)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextCard();
+            else if (e.key === 'ArrowLeft') prevCard();
+            else if (e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault(); // Hogy ne görgessen le a szóköz
+                toggleCard();
+            }
+        });
+
+        // Inicializálás induláskor
+        loadCard();
+    </script>
+</body>
+</html>
